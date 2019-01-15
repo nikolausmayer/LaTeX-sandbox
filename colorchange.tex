@@ -1,0 +1,51 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{decorations,arrows}
+\begin{document}
+
+\makeatletter
+
+\pgfkeys{/pgf/decoration/.cd,
+  start color/.store in=\startcolor,
+  end color/.store in=\endcolor
+}
+
+\pgfdeclaredecoration{color change arrow}{initial}{
+  \state{initial}[width=0pt, next state=line, persistent precomputation={%
+    \pgfmathdivide{50}{\pgfdecoratedpathlength}%
+    \let\increment=\pgfmathresult%
+    \def\x{0}%
+  }]{}
+  \state{line}[width=0.5pt, switch if less than=5.0\pgflinewidth to final,
+    persistent postcomputation={%
+      \pgfmathadd@{\x}{\increment}%
+      \let\x=\pgfmathresult%
+    }]{%
+    \pgfsetlinewidth{\pgflinewidth}%
+    \pgfsetarrows{-}%
+    \pgfpathmoveto{\pgfpointorigin}%
+    \pgfpathlineto{\pgfqpoint{0.75pt}{0pt}}%
+    \pgfsetstrokecolor{\endcolor!\x!\startcolor}%
+    \pgfusepath{stroke}%
+  }
+  \state{final}{%
+    \pgfsetlinewidth{\pgflinewidth}%
+    \pgfpathmoveto{\pgfpointorigin}%
+    \pgfpathlineto{\pgfpointdecoratedpathlast\advance\pgf@x by2.0\pgflinewidth}%
+    \color{\endcolor!\x!\startcolor}%
+    \pgfusepath{stroke}%
+  }
+}
+
+\makeatother
+
+\tikz\draw[-triangle 45, ultra thick, decoration={color change arrow,
+start color=yellow, end color=red}, decorate] (0cm,0cm) arc
+(0:340:1cm) ;
+
+
+\tikz\draw[-triangle 45, ultra thick, decoration={color change arrow,
+start color=green, end color=blue}, decorate] (0cm,0cm) arc
+(0:340:1cm) ;
+
+\end{document}   
